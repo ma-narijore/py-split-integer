@@ -1,16 +1,21 @@
+import pytest
 from app import split_integer
 
 
 class TestSplitInteger:
-    def test_sum_of_the_parts_should_be_equal_to_value(self) -> None:
+    @pytest.mark.parametrize(
+        "value, parts",
+        [(3, 3), (17, 4), (9, 3), (2, 4), (100, 9)],
+    )
+    def test_sum_of_the_parts_should_be_equal_to_value(
+        self, value: int, parts: int
+    ) -> None:
         """Ensure the sum of parts equals the original value."""
-        cases = [(3, 3), (17, 4), (9, 3), (2, 4), (100, 9)]
-        for value, parts in cases:
-            result = split_integer.split_integer(value, parts)
-            assert sum(result) == value, f"Sum mismatch for {value} {parts}"
+        result = split_integer.split_integer(value, parts)
+        assert sum(result) == value, f"mismatch for val={value}, par={parts}"
 
     def test_should_split_into_equal_parts_when_value_divisible_by_parts(
-        self,
+            self
     ) -> None:
         """Check equal split when value divisible by number of parts."""
         result = split_integer.split_integer(9, 3)
@@ -18,48 +23,63 @@ class TestSplitInteger:
             x == result[0] for x in result
         ), "Not all parts equal for divisible value"
 
+    @pytest.mark.parametrize("value, parts", [(3, 1), (10, 1), (0, 1)])
     def test_should_return_part_equals_to_value_when_split_into_one_part(
-        self,
+        self, value: int, parts: int
     ) -> None:
         """Check single part case."""
-        result = split_integer.split_integer(3, 1)
-        assert result == [3], f"Expected [3], got {result}"
+        result = split_integer.split_integer(value, parts)
+        assert result == [value], f"Expected [{value}], got {result}"
 
-    def test_parts_should_be_sorted_when_they_are_not_equal(self) -> None:
+    @pytest.mark.parametrize("value, parts", [(17, 4), (10, 3), (7, 2)])
+    def test_parts_should_be_sorted_when_they_are_not_equal(
+        self, value: int, parts: int
+    ) -> None:
         """Ensure result is sorted."""
-        result = split_integer.split_integer(17, 4)
-        assert result == sorted(result), "Result is not sorted"
+        result = split_integer.split_integer(value, parts)
+        assert result == sorted(result), f"Result isn't sorted for val={value}"
 
+    @pytest.mark.parametrize(
+        "value, parts, expected",
+        [(2, 4, [0, 0, 1, 1]), (1, 3, [0, 0, 1]), (3, 5, [0, 0, 1, 1, 1])],
+    )
     def test_should_add_zeros_when_value_is_less_than_number_of_parts(
-        self,
+        self, value: int, parts: int, expected: list[int]
     ) -> None:
         """Add zeros when value < parts."""
-        result = split_integer.split_integer(2, 4)
-        assert sorted(result) == [0, 0, 1, 1], f"[0, 0, 1, 1], got {result}"
+        result = split_integer.split_integer(value, parts)
+        assert result == expected, f"Expected {expected}, got {result}"
 
-    def test_difference_between_parts_should_be_at_most_one(self) -> None:
+    @pytest.mark.parametrize(
+        "value, parts", [(17, 4), (10, 3), (2, 4), (100, 9), (7, 3)]
+    )
+    def test_difference_between_parts_should_be_at_most_one(
+        self, value: int, parts: int
+    ) -> None:
         """Ensure all parts differ by at most one."""
-        cases = [(17, 4), (10, 3), (2, 4), (100, 9), (7, 3)]
-        for value, parts in cases:
-            result = split_integer.split_integer(value, parts)
-            max_diff = max(result) - min(result)
-            assert max_diff <= 1, (
-                f"Parts differ by more than 1 for {value=} {parts=}"
-            )
+        result = split_integer.split_integer(value, parts)
+        max_diff = max(result) - min(result)
+        assert max_diff <= 1, (
+            f"Parts differ by more than 1 for value={value}, parts={parts}"
+        )
 
-    def test_should_return_correct_number_of_parts(self) -> None:
+    @pytest.mark.parametrize("value, parts", [(17, 4), (2, 4), (9, 3), (1, 5)])
+    def test_should_return_correct_number_of_parts(
+        self, value: int, parts: int
+    ) -> None:
         """Ensure correct number of parts returned."""
-        cases = [(17, 4), (2, 4), (9, 3), (1, 5)]
-        for value, parts in cases:
-            result = split_integer.split_integer(value, parts)
-            assert len(result) == parts, (
-                f"Expected {parts} parts, got {len(result)}"
-            )
+        result = split_integer.split_integer(value, parts)
+        assert len(result) == parts, (
+            f"Expected {parts} parts, got {len(result)}"
+        )
 
-    def test_result_should_not_depend_on_order_of_distribution(self) -> None:
+    @pytest.mark.parametrize("value, parts",
+                             [(10, 3), (11, 4), (17, 4), (2, 4)]
+                             )
+    def test_result_should_not_depend_on_order_of_distribution(
+        self, value: int, parts: int
+    ) -> None:
         """Remainder distribution should not affect sorted result."""
-        cases = [(10, 3), (11, 4), (17, 4), (2, 4)]
-        for value, parts in cases:
-            result = split_integer.split_integer(value, parts)
-            expected = sorted(result)
-            assert result == expected, "Result order inconsistency"
+        result = split_integer.split_integer(value, parts)
+        expected = sorted(result)
+        assert result == expected, f"Order inconsistency for val={value}"
