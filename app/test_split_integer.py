@@ -12,32 +12,35 @@ class TestSplitInteger:
     ) -> None:
         """Ensure the sum of parts equals the original value."""
         result = split_integer.split_integer(value, parts)
-        assert sum(result) == value, f"mismatch for val={value}, par={parts}"
+        assert sum(result) == value, f"Mismatch for val={value}, part={parts}"
 
     def test_should_split_into_equal_parts_when_value_divisible_by_parts(
-            self
-    ) -> None:
+            self) -> None:
         """Check equal split when value divisible by number of parts."""
-        result = split_integer.split_integer(9, 3)
-        assert all(
-            x == result[0] for x in result
-        ), "Not all parts equal for divisible value"
+        result = split_integer.split_integer(6, 2)
+        assert result == [3, 3], f"Expected [3, 3], got {result}"
 
-    @pytest.mark.parametrize("value, parts", [(3, 1), (10, 1), (0, 1)])
+    @pytest.mark.parametrize("value, expected", [(8, [8]), (3, [3])])
     def test_should_return_part_equals_to_value_when_split_into_one_part(
-        self, value: int, parts: int
+        self, value: int, expected: list[int]
     ) -> None:
         """Check single part case."""
-        result = split_integer.split_integer(value, parts)
-        assert result == [value], f"Expected [{value}], got {result}"
+        result = split_integer.split_integer(value, 1)
+        assert result == expected, f"Expected {expected}, got {result}"
 
-    @pytest.mark.parametrize("value, parts", [(17, 4), (10, 3), (7, 2)])
+    @pytest.mark.parametrize(
+        "value, parts, expected",
+        [
+            (17, 4, [4, 4, 4, 5]),
+            (32, 6, [5, 5, 5, 5, 6, 6]),
+        ],
+    )
     def test_parts_should_be_sorted_when_they_are_not_equal(
-        self, value: int, parts: int
+        self, value: int, parts: int, expected: list[int]
     ) -> None:
-        """Ensure result is sorted."""
+        """Ensure parts are sorted and match expected uneven splits."""
         result = split_integer.split_integer(value, parts)
-        assert result == sorted(result), f"Result isn't sorted for val={value}"
+        assert result == expected, f"Expected {expected}, got {result}"
 
     @pytest.mark.parametrize(
         "value, parts, expected",
@@ -82,4 +85,4 @@ class TestSplitInteger:
         """Remainder distribution should not affect sorted result."""
         result = split_integer.split_integer(value, parts)
         expected = sorted(result)
-        assert result == expected, f"Order inconsistency for val={value}"
+        assert result == expected, f"Order inconsistency for value={value}"
